@@ -21,7 +21,7 @@ _steps = [
 
 
 # This automatically reads in the configuration
-@hydra.main(config_name='config')
+@hydra.main(config_name='config', config_path=".")
 def go(config: DictConfig):
 
     # Setup the wandb experiment. All runs will be grouped under this name
@@ -32,63 +32,73 @@ def go(config: DictConfig):
     steps_par = config['main']['steps']
     active_steps = steps_par.split(",") if steps_par != "all" else _steps
 
-    # Move to a temporary directory
-    with tempfile.TemporaryDirectory() as tmp_dir:
 
-        if "download" in active_steps:
-            # Download file and load in W&B
-            _ = mlflow.run(
-                f"{config['main']['components_repository']}/get_data",
-                "main",
-                parameters={
-                    "sample": config["etl"]["sample"],
-                    "artifact_name": "sample.csv",
-                    "artifact_type": "raw_data",
-                    "artifact_description": "Raw file as downloaded"
-                },
-            )
+    def get_step_abs_pth(step_name: str) -> str:
+        """
+        Get absolute path to step to run it with mlflow.
+        Throw error if path does not exist.
+        """
+        step_abs_pth = os.path.join(hydra.utils.get_original_cwd(), "src", step_name)
+        assert os.path.isdir(step_abs_pth)
+        return step_abs_pth
 
-        if "basic_cleaning" in active_steps:
-            ##################
-            # Implement here #
-            ##################
-            pass
 
-        if "data_check" in active_steps:
-            ##################
-            # Implement here #
-            ##################
-            pass
 
-        if "data_split" in active_steps:
-            ##################
-            # Implement here #
-            ##################
-            pass
+    if "download" in active_steps:
+        # Download file and load in W&B
+        _ = mlflow.run(
+            get_step_abs_pth("download_data"),
+            "main",
+            parameters={
+                "sample_url": config["etl"]["sample_url"],
+                "sample": config["etl"]["sample"],
+                "artifact_name": "sample.csv",
+                "artifact_type": "raw_data",
+                "artifact_description": "Raw file as downloaded"
+            },
+        )
 
-        if "train_random_forest" in active_steps:
+    if "basic_cleaning" in active_steps:
+        ##################
+        # Implement here #
+        ##################
+        pass
 
-            # NOTE: we need to serialize the random forest configuration into JSON
-            rf_config = os.path.abspath("rf_config.json")
-            with open(rf_config, "w+") as fp:
-                json.dump(dict(config["modeling"]["random_forest"].items()), fp)  # DO NOT TOUCH
+    if "data_check" in active_steps:
+        ##################
+        # Implement here #
+        ##################
+        pass
 
-            # NOTE: use the rf_config we just created as the rf_config parameter for the train_random_forest
-            # step
+    if "data_split" in active_steps:
+        ##################
+        # Implement here #
+        ##################
+        pass
 
-            ##################
-            # Implement here #
-            ##################
+    if "train_random_forest" in active_steps:
 
-            pass
+        # NOTE: we need to serialize the random forest configuration into JSON
+        rf_config = os.path.abspath("rf_config.json")
+        with open(rf_config, "w+") as fp:
+            json.dump(dict(config["modeling"]["random_forest"].items()), fp)  # DO NOT TOUCH
 
-        if "test_regression_model" in active_steps:
+        # NOTE: use the rf_config we just created as the rf_config parameter for the train_random_forest
+        # step
 
-            ##################
-            # Implement here #
-            ##################
+        ##################
+        # Implement here #
+        ##################
 
-            pass
+        pass
+
+    if "test_regression_model" in active_steps:
+
+        ##################
+        # Implement here #
+        ##################
+
+        pass
 
 
 if __name__ == "__main__":
