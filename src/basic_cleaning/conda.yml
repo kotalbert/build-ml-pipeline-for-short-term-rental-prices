@@ -1,9 +1,10 @@
-name: {{cookiecutter.step_name}}
+name: basic_cleaning
 channels:
   - conda-forge
   - defaults
 dependencies:
   - python=3.8
   - pip=22.1.2
+  - pandas=1.4.3
   - pip:
     - wandb==0.12.17

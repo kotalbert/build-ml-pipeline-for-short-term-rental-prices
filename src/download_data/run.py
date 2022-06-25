@@ -8,6 +8,7 @@ import os
 import tempfile
 
 import requests
+
 import wandb
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
@@ -38,6 +39,7 @@ def go(args):
             description=args.artifact_description
         )
 
+        logger.info("Logging artifact to W&B")
         artifact.add_file(tmp_file)
         run.log_artifact(artifact)
 
