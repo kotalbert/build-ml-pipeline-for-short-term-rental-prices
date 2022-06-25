@@ -22,11 +22,11 @@ _steps = [
 @hydra.main(config_name='config', config_path=".")
 def go(config: DictConfig):
     # Set up the wandb experiment. All runs will be grouped under this name
-    os.environ["WANDB_PROJECT"] = config["main"]["project_name"]
-    os.environ["WANDB_RUN_GROUP"] = config["main"]["experiment_name"]
+    os.environ["WANDB_PROJECT"] = config.main.project_name
+    os.environ["WANDB_RUN_GROUP"] = config.main.experiment_name
 
     # Steps to execute
-    steps_par = config['main']['steps']
+    steps_par = config.main.steps
     active_steps = steps_par.split(",") if steps_par != "all" else _steps
 
     def get_step_abs_pth(step_name: str) -> str:
@@ -47,15 +47,15 @@ def go(config: DictConfig):
             get_step_abs_pth("download_data"),
             "main",
             parameters={
-                "sample_url": config["etl"]["sample_url"],
-                "sample": config["etl"]["sample"],
+                "sample_url": config.etl.sample_url,
+                "sample": config.etl.sample,
                 "artifact_name": raw_data_filename,
                 "artifact_type": "raw_data",
                 "artifact_description": "Raw file as downloaded"
             },
         )
 
-    clean_data_filename = "clean_data.csv"
+    clean_data_filename = "clean_sample.csv"
     if "basic_cleaning" in active_steps:
         _ = mlflow.run(
             get_step_abs_pth("basic_cleaning"),
@@ -63,7 +63,7 @@ def go(config: DictConfig):
             parameters={
                 "input_artifact": f"{raw_data_filename}:latest",
                 "output_artifact": clean_data_filename,
-                "output_type": "clean_data",
+                "output_type": "clean_sample",
                 "output_description": "Data after basic cleaning",
                 "min_price": config.etl.min_price,
                 "max_price": config.etl.max_price
@@ -71,10 +71,17 @@ def go(config: DictConfig):
         )
 
     if "data_check" in active_steps:
-        ##################
-        # Implement here #
-        ##################
-        pass
+        _ = mlflow.run(
+            get_step_abs_pth("data_check"),
+            "main",
+            parameters={
+                "csv": f"{clean_data_filename}:latest",
+                "ref": f"{clean_data_filename}:reference",
+                "kl_threshold": config.data_check.kl_threshold,
+                "min_price": config.etl.min_price,
+                "max_price": config.etl.max_price
+            }
+        )
 
     if "data_split" in active_steps:
         ##################

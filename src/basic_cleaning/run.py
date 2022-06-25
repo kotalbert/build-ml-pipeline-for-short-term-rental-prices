@@ -15,18 +15,21 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
 
 
-def go(args):
+def main(args):
+    """
+    Main function of basic_cleaning step
+    """
     run = wandb.init(job_type="basic_cleaning")
     run.config.update(args)
 
-    logger.info("Downloading Artifact")
+    logger.info("Downloading Artifact: %s", args.input_artifact)
     artifact = run.use_artifact(args.input_artifact)
     artifact_path = artifact.file()
 
     logger.info("Reading data")
     df = pd.read_csv(artifact_path)
 
-    logger.info("Remove `price` outliers")
+    logger.info("Remove `price` outliers: %f - %f", args.min_price, args.max_price)
     idx = df['price'].between(args.min_price, args.max_price)
     df = df[idx].copy()
 
@@ -34,9 +37,9 @@ def go(args):
     df['last_review'] = pd.to_datetime(df['last_review'])
 
     logger.info("Preparing data Artifact for logging with W&B")
-    with TemporaryDirectory() as td:
-        filename = os.path.join(td, args.output_artifact)
-        df.to_csv(filename)
+    with TemporaryDirectory() as temp_dir:
+        filename = os.path.join(temp_dir, args.output_artifact)
+        df.to_csv(filename, index=False)
 
         artifact = wandb.Artifact(
             name=args.output_artifact,
@@ -94,6 +97,6 @@ if __name__ == "__main__":
         required=True
     )
 
-    args = parser.parse_args()
+    parsed_args = parser.parse_args()
 
-    go(args)
+    main(parsed_args)

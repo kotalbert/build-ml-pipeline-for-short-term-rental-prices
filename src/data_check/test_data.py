@@ -1,11 +1,13 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import scipy.stats
 
 
 def test_column_names(data):
-
-    expected_colums = [
+    """
+    Tested set should have the same columns as reference
+    """
+    expected_columns = [
         "id",
         "name",
         "host_id",
@@ -24,19 +26,19 @@ def test_column_names(data):
         "availability_365",
     ]
 
-    these_columns = data.columns.values
+    actual_columns = data.columns.values
 
-    # This also enforces the same order
-    assert list(expected_colums) == list(these_columns)
+    assert set(expected_columns) == set(actual_columns)
 
 
 def test_neighborhood_names(data):
-
+    """
+    Tested set must have the same unique values in `neighbourhood_group` column
+    """
     known_names = ["Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island"]
 
     neigh = set(data['neighbourhood_group'].unique())
 
-    # Unordered check
     assert set(known_names) == set(neigh)
 
 
@@ -49,10 +51,10 @@ def test_proper_boundaries(data: pd.DataFrame):
     assert np.sum(~idx) == 0
 
 
-def test_similar_neigh_distrib(data: pd.DataFrame, ref_data: pd.DataFrame, kl_threshold: float):
+def test_similar_neighbourhood_distribution(data: pd.DataFrame, ref_data: pd.DataFrame, kl_threshold: float):
     """
     Apply a threshold on the KL divergence to detect if the distribution of the new data is
-    significantly different than that of the reference dataset
+    significantly different from that of the reference dataset
     """
     dist1 = data['neighbourhood_group'].value_counts().sort_index()
     dist2 = ref_data['neighbourhood_group'].value_counts().sort_index()
@@ -60,6 +62,18 @@ def test_similar_neigh_distrib(data: pd.DataFrame, ref_data: pd.DataFrame, kl_th
     assert scipy.stats.entropy(dist1, dist2, base=2) < kl_threshold
 
 
-########################################################
-# Implement here test_row_count and test_price_range   #
-########################################################
+def test_row_count(data):
+    """
+    Tested data size (row number) should be withing set limits
+    """
+    lower_limit = 15000
+    upper_limit = 1000000
+    data_row_count = data.shape[0]
+    assert lower_limit < data_row_count < upper_limit
+
+
+def test_price_range(data: pd.DataFrame, min_price, max_price):
+    """
+    Accepted price (`price` column), should be between set limits
+    """
+    assert data['price'].between(min_price, max_price).all()

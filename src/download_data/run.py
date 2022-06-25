@@ -15,23 +15,27 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
 
 
-def go(args):
+def main(args):
+    """
+    Main function of `download_data` step
+    """
     run = wandb.init(job_type="download_data")
     run.config.update(args)
 
     sample_uri = os.path.join(args.sample_url, args.sample)
 
     # use temp file for logging an artifact to W&B
-    with tempfile.TemporaryDirectory() as td:
-        logger.info(f"Getting data from URI: {sample_uri}")
-        r = requests.get(sample_uri)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        logger.info("Getting data from URI: %s", sample_uri)
+        resp = requests.get(sample_uri)
 
-        if not r.ok:
-            r.raise_for_status()
-        tmp_file = os.path.join(td, 'sample.csv')
-        logger.info(f"Writing sample to temporary file: {tmp_file}")
-        with open(tmp_file, 'w') as tf:
-            tf.write(r.text)
+        if not resp.ok:
+            resp.raise_for_status()
+
+        tmp_file = os.path.join(temp_dir, 'sample.csv')
+        logger.info("Writing sample to temporary file: %s", tmp_file)
+        with open(tmp_file, 'w', encoding="utf-8") as temp_file:
+            temp_file.write(resp.text)
 
         artifact = wandb.Artifact(
             args.artifact_name,
@@ -59,6 +63,6 @@ if __name__ == "__main__":
         "artifact_description", type=str, help="A brief description of this artifact"
     )
 
-    args = parser.parse_args()
+    parsed_args = parser.parse_args()
 
-    go(args)
+    main(parsed_args)
