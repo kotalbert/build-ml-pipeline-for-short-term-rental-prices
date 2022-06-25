@@ -32,9 +32,9 @@ def main(args):
         if not resp.ok:
             resp.raise_for_status()
 
-        tmp_file = os.path.join(temp_dir, 'sample.csv')
-        logger.info("Writing sample to temporary file: %s", tmp_file)
-        with open(tmp_file, 'w', encoding="utf-8") as temp_file:
+        temp_file = os.path.join(temp_dir, 'sample.csv')
+        logger.info("Writing sample to temporary file: %s", temp_file)
+        with open(temp_file, 'w', encoding="utf-8") as temp_file:
             temp_file.write(resp.text)
 
         artifact = wandb.Artifact(
@@ -44,7 +44,7 @@ def main(args):
         )
 
         logger.info("Logging artifact to W&B")
-        artifact.add_file(tmp_file)
+        artifact.add_file(temp_file)
         run.log_artifact(artifact)
 
 

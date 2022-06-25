@@ -84,10 +84,17 @@ def go(config: DictConfig):
         )
 
     if "data_split" in active_steps:
-        ##################
-        # Implement here #
-        ##################
-        pass
+        _ = mlflow.run(
+            get_step_abs_pth("data_split"),
+            "main",
+            parameters={
+                "input_artifact": f"{clean_data_filename}:latest",
+                "test_size": config.modeling.test_size,
+                "random_seed": config.modeling.random_seed,
+                "stratify_by": config.modeling.stratify_by
+
+            }
+        )
 
     if "train_random_forest" in active_steps:
         # NOTE: we need to serialize the random forest configuration into JSON
