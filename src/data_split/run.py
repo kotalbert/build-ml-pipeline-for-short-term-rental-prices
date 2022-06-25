@@ -23,7 +23,7 @@ def main(args):
     run = wandb.init(job_type="data_split")
     run.config.update(args)
 
-    logger.info("Fetching artifact %s", args.input_artifact)
+    logger.info("Fetching artifact: %s", args.input_artifact)
     artifact_local_path = run.use_artifact(args.input_artifact).file()
 
     df = pd.read_csv(artifact_local_path)
