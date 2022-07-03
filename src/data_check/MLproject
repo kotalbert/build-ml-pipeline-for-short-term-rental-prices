@@ -6,11 +6,12 @@ entry_points:
     parameters:
 
       csv:
-        description: Input CSV file to be tested
+        description: Fully qualified name to input Artifact with csv file to be tested
         type: string
 
       ref:
-        description: Reference CSV file to compare the new csv to
+        description: >- 
+          Fully qualified name to reference Artifact with csv file to compare the new csv to
         type: string
 
       kl_threshold:
@@ -25,4 +26,7 @@ entry_points:
         description: Maximum accepted price
         type: float
 
-    command: "pytest . -vv --csv {csv} --ref {ref} --kl_threshold {kl_threshold} --min_price {min_price} --max_price {max_price}"
+    command: >- 
+          pytest -s -vv . --csv {csv} --ref {ref}\
+            --kl_threshold {kl_threshold}\
+            --min_price {min_price} --max_price {max_price}
