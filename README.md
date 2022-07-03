@@ -8,6 +8,12 @@ The source code of this project can be found under URL:
 
 https://github.com/kotalbert/build-ml-pipeline-for-short-term-rental-prices
 
+In order to run MLFlow project directly from github, the following syntaxt
+needs to be applied (for version 1.0.0):
+
+```shell
+mlflow run https://1.0.0@github.com/kotalbert/build-ml-pipeline-for-short-term-rental-prices.git
+```
 
 ## Table of contents
 
