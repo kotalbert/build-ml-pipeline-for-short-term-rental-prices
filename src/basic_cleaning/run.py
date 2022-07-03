@@ -47,7 +47,7 @@ def main(args):
         artifact = wandb.Artifact(
             name=args.output_artifact,
             type=args.output_type,
-            description=args.output_description:
+            description=args.output_description
         )
         artifact.add_file(filename)
 
