@@ -55,7 +55,7 @@ def main(args):
     x = pd.read_csv(train_local_path)
     y = x.pop("price")
 
-    logger.info("Minimum price: %f, Maximum price: %f", y.min(), y.max())
+    logger.info("Minimum price: %.2f, Maximum price: %.2f", y.min(), y.max())
 
     x_train, x_val, y_train, y_val = train_test_split(
         x, y, test_size=args.val_size, stratify=x[args.stratify_by], random_state=args.random_seed

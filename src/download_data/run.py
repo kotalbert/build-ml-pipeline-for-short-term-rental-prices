@@ -32,10 +32,10 @@ def main(args):
         if not resp.ok:
             resp.raise_for_status()
 
-        temp_file = os.path.join(temp_dir, 'sample.csv')
+        temp_file = os.path.join(temp_dir, args.sample)
         logger.info("Writing sample to temporary file: %s", temp_file)
-        with open(temp_file, 'w', encoding="utf-8") as temp_file:
-            temp_file.write(resp.text)
+        with open(temp_file, 'w', encoding="utf-8") as text_io:
+            text_io.write(resp.text)
 
         artifact = wandb.Artifact(
             args.artifact_name,

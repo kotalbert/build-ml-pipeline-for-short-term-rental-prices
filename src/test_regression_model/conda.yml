@@ -1,0 +1,12 @@
+name: test_regression_model
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pandas=1.4.2
+  - pip=22.1.2
+  - mlflow=1.26.1
+  - scikit-learn=1.1.1
+  - pip:
+      - wandb==0.12.17

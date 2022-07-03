@@ -11,10 +11,7 @@ _steps = [
     "data_check",
     "data_split",
     "train_random_forest",
-    # NOTE: We do not include this in the steps, so it is not run by mistake.
-    # You first need to promote a model export to "prod" before you can run this,
-    # then you need to run this step explicitly
-    #    "test_regression_model"
+    "test_regression_model"
 ]
 
 
@@ -39,7 +36,6 @@ def main(config: DictConfig):
         return step_abs_pth
 
     # put data name literal to variable, reuse it in multiple steps
-    raw_data_filename = "sample.csv"
     if "download" in active_steps:
         _ = mlflow.run(
             get_step_abs_pth("download_data"),
@@ -47,7 +43,7 @@ def main(config: DictConfig):
             parameters={
                 "sample_url": config.etl.sample_url,
                 "sample": config.etl.sample,
-                "artifact_name": raw_data_filename,
+                "artifact_name": config.etl.sample,
                 "artifact_type": "raw_data",
                 "artifact_description": "Raw file as downloaded"
             },
@@ -59,7 +55,7 @@ def main(config: DictConfig):
             get_step_abs_pth("basic_cleaning"),
             "main",
             parameters={
-                "input_artifact": f"{raw_data_filename}:latest",
+                "input_artifact": f"{config.etl.sample}:latest",
                 "output_artifact": clean_data_filename,
                 "output_type": "clean_sample",
                 "output_description": "Data after basic cleaning",
@@ -113,13 +109,15 @@ def main(config: DictConfig):
             }
         )
 
-
     if "test_regression_model" in active_steps:
-        ##################
-        # Implement here #
-        ##################
-
-        pass
+        _ = mlflow.run(
+            get_step_abs_pth("test_regression_model"),
+            "main",
+            parameters={
+                "mlflow_model": "model_export:prod",
+                "test_dataset": "sample2.csv:latest"
+            }
+        )
 
 
 if __name__ == "__main__":
