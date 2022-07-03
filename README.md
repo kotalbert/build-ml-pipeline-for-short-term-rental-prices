@@ -4,7 +4,10 @@ time on various rental platforms. You need to estimate the typical price for a g
 on the price of similar properties. Your company receives new data in bulk every week. The model needs 
 to be retrained with the same cadence, necessitating an end-to-end pipeline that can be reused.
 
-In this project you will build such a pipeline.
+The source code of this project can be found under URL:
+
+https://github.com/kotalbert/build-ml-pipeline-for-short-term-rental-prices
+
 
 ## Table of contents
 
