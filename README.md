@@ -8,6 +8,10 @@ The source code of this project can be found under URL:
 
 https://github.com/kotalbert/build-ml-pipeline-for-short-term-rental-prices
 
+The Weights & Biases project accompanying source code can be found under URL:
+
+https://wandb.ai/kotalbert/nyc_airbnb
+
 In order to run MLFlow project directly from github, the following syntaxt
 needs to be applied (for version 1.0.0):
 
